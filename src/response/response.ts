@@ -9,6 +9,7 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+  message?: string;
   duration: string;
   timestamp: string;
   pagination?: PaginationMeta; // ✅ optional field

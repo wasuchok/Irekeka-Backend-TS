@@ -1,3 +1,4 @@
+import { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import path from "path";
 
@@ -26,3 +27,22 @@ const stockStorage = multer.diskStorage({
 
 export const upload = multer({ storage: urgentStorage }); // backward compatibility for urgent routes
 export const stockUpload = multer({ storage: stockStorage });
+
+const stockFields = [
+    { name: "img_1", maxCount: 1 },
+    { name: "img_2", maxCount: 1 },
+] as const;
+
+const stockFieldsMiddleware = stockUpload.fields(stockFields);
+
+const isMultipartForm = (contentType?: string) =>
+    !!contentType && contentType.toLowerCase().includes("multipart/form-data");
+
+export const optionalStockUpload = (req: Request, res: Response, next: NextFunction) => {
+    if (isMultipartForm(req.headers["content-type"])) {
+        return stockFieldsMiddleware(req, res, next);
+    }
+    return next();
+};
+
+export const stockUploadFields = stockFieldsMiddleware;
