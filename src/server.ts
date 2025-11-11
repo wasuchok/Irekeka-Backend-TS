@@ -9,6 +9,7 @@ import RecordRoutes from './routes/record.route';
 import StockRoutes from './routes/stock.route';
 import UrgentRoutes from './routes/urgent.route';
 import VersionRoutes from './routes/version.route';
+import DashboardRoutes from './routes/dashboard.route';
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use("/api/v1/emp", EmpRoutes)
 app.use("/api/v1/record", RecordRoutes)
 app.use("/api/v1/borrow-urgent", UrgentRoutes)
 app.use("/api/v1/version", VersionRoutes)
+app.use("/api/v1/dashboard", DashboardRoutes)
 
 
 
