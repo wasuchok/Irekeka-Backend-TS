@@ -49,8 +49,8 @@ const resolveCodeDate = (codeDate?: string, createDate?: string | Date) => {
     createDate instanceof Date
       ? createDate
       : createDate
-      ? new Date(createDate)
-      : new Date();
+        ? new Date(createDate)
+        : new Date();
 
   const isValid = !Number.isNaN(baseDate.getTime());
   const target = isValid ? baseDate : new Date();
