@@ -1,3 +1,9 @@
+export interface PaginationMeta {
+  totalItems: number;
+  totalPages: number;
+  currentPage: number;
+  pageSize: number;
+}
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -5,13 +11,14 @@ export interface ApiResponse<T> {
   error?: string;
   duration: string;
   timestamp: string;
+  pagination?: PaginationMeta; // ✅ optional field
 }
 
 
 export const calculateDuration = (startTime: number): string => {
   const endTime = Date.now();
   const durationMs = endTime - startTime;
-  
+
 
   if (durationMs < 1000) {
     return `${durationMs} มิลลิวินาที`;

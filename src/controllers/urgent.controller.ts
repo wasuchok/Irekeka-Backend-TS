@@ -11,13 +11,16 @@ function formatDateToSQL(date: Date) {
 }
 
 async function generateDailyCode(t: Transaction) {
+
     await sequelize.query(
         "SELECT TOP 1 code FROM tb_Irekeka_Urgent WITH (TABLOCKX)",
         { transaction: t, type: QueryTypes.SELECT }
     );
 
     const now = new Date();
-    const yearMonth = now.getFullYear() + String(now.getMonth() + 1).padStart(2, "0");
+    const dateCode = String(now.getFullYear()).slice(-2) +
+        String(now.getMonth() + 1).padStart(2, "0") +
+        String(now.getDate()).padStart(2, "0");
 
     const [result]: any = await sequelize.query(
         `SELECT MAX(CAST(SUBSTRING(code, 8, 2) AS INT)) AS maxNumber
@@ -27,10 +30,11 @@ async function generateDailyCode(t: Transaction) {
     );
 
     const nextNum = (result?.maxNumber ?? 0) + 1;
-    const newCode = `${yearMonth}-${String(nextNum).padStart(2, "0")}`;
+    const newCode = `${dateCode}-${String(nextNum).padStart(2, "0")}`;
 
     return newCode;
 }
+
 
 
 export const borrowUrgent = async (req: Request, res: Response) => {
