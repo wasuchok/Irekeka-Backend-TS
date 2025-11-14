@@ -182,7 +182,7 @@ export const getStocksPagination = async (req: Request, res: Response) => {
   const startTime = Date.now();
 
   try {
-    // 📦 ดึง query params
+
     const {
       page = 1,
       limit = 10,
@@ -195,7 +195,7 @@ export const getStocksPagination = async (req: Request, res: Response) => {
 
     const offset = (Number(page) - 1) * Number(limit);
 
-    // 🧠 เงื่อนไขค้นหาแบบ dynamic
+
     const whereClause: any = {};
 
     if (status) whereClause.status = status;
@@ -206,7 +206,7 @@ export const getStocksPagination = async (req: Request, res: Response) => {
       whereClause.equipment_name = { [Op.like]: `%${equipment_name}%` };
     if (type) whereClause.type = { [Op.like]: `%${type}%` };
 
-    // 🧾 ดึงข้อมูลพร้อมนับจำนวนทั้งหมด
+
     const { rows, count } = await Stock.findAndCountAll({
       where: whereClause,
       offset,

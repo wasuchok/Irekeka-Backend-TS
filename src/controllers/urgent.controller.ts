@@ -152,3 +152,88 @@ ORDER BY u.date_out DESC
         res.status(500).json(response);
     }
 }
+
+export const getAllUrgentAdmin = async (req: Request, res: Response) => {
+    const startTime = Date.now();
+    try {
+        const status =
+            typeof req.query.status === "string"
+                ? req.query.status.toLowerCase()
+                : undefined;
+        const userOut =
+            typeof req.query.user_out === "string"
+                ? req.query.user_out
+                : undefined;
+        const dateFrom =
+            typeof req.query.date_from === "string"
+                ? req.query.date_from
+                : undefined;
+        const dateTo =
+            typeof req.query.date_to === "string"
+                ? req.query.date_to
+                : undefined;
+
+        const conditions: string[] = ["1=1"];
+        const replacements: Record<string, string> = {};
+
+        if (userOut) {
+            conditions.push("u.user_out = :userOut");
+            replacements.userOut = userOut;
+        }
+
+        if (status === "borrowed") {
+            conditions.push("u.date_in IS NULL");
+        } else if (status === "returned") {
+            conditions.push("u.date_in IS NOT NULL");
+        }
+
+        if (dateFrom) {
+            conditions.push("CONVERT(DATETIME, u.date_out, 120) >= :dateFrom");
+            replacements.dateFrom = dateFrom;
+        }
+
+        if (dateTo) {
+            conditions.push("CONVERT(DATETIME, u.date_out, 120) <= :dateTo");
+            replacements.dateTo = dateTo;
+        }
+
+        const sql = `
+SELECT
+    u.*, 
+    e_out.emp_name AS user_out_name,
+    e_out.Sect AS user_out_section,
+    e_in.emp_name AS user_in_name,
+    CASE WHEN u.date_in IS NULL THEN 'Not Returned' ELSE 'Returned' END AS status
+FROM tb_Irekeka_Urgent u
+LEFT JOIN v_Get_Emp_Name e_out
+    ON u.user_out = e_out.emp_id
+LEFT JOIN v_Get_Emp_Name e_in
+    ON u.user_in = e_in.emp_id
+WHERE ${conditions.join(" AND ")}
+ORDER BY u.date_out DESC, u.seq DESC
+`;
+
+        const data = await sequelize.query(sql, {
+            replacements,
+            type: QueryTypes.SELECT,
+        });
+
+        const response: ApiResponse<typeof data> = {
+            success: true,
+            duration: calculateDuration(startTime),
+            timestamp: new Date().toISOString(),
+            data,
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        console.error(error);
+        const response: ApiResponse<null> = {
+            success: false,
+            duration: calculateDuration(startTime),
+            timestamp: new Date().toISOString(),
+            error: 'เกิดข้อผิดพลาดในการดึงข้อมูลสต็อก',
+        };
+        res.status(500).json(response);
+    }
+};
