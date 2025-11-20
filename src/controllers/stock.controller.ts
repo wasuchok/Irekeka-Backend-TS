@@ -211,7 +211,7 @@ export const getStocksPagination = async (req: Request, res: Response) => {
       where: whereClause,
       offset,
       limit: Number(limit),
-      order: [["seq", "DESC"]],
+      order: [["seq", "ASC"]],
     });
 
     const totalPages = Math.ceil(count / Number(limit));

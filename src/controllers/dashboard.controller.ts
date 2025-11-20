@@ -142,10 +142,6 @@ export const getReturnCompliance = async (req: Request, res: Response) => {
                 THEN 1 ELSE 0 END) AS onTime,
           SUM(CASE
                 WHEN r.date_in IS NULL
-                  AND CAST(DATEADD(DAY, ISNULL(r.num_date, :defaultDue), r.date_out) AS DATE) = CAST(GETDATE() AS DATE)
-                THEN 1 ELSE 0 END) AS dueToday,
-          SUM(CASE
-                WHEN r.date_in IS NULL
                   AND DATEADD(DAY, ISNULL(r.num_date, :defaultDue), r.date_out) < GETDATE()
                 THEN 1 ELSE 0 END) AS overdue
         FROM [ITDB].[dbo].[tb_Irekeka_Record] r
@@ -158,7 +154,6 @@ export const getReturnCompliance = async (req: Request, res: Response) => {
 
     const total =
       Number(row?.onTime ?? 0) +
-      Number(row?.dueToday ?? 0) +
       Number(row?.overdue ?? 0) || 0;
 
     const percent = (value: number) =>
@@ -168,10 +163,6 @@ export const getReturnCompliance = async (req: Request, res: Response) => {
       onTime: {
         count: Number(row?.onTime ?? 0),
         percent: percent(Number(row?.onTime ?? 0)),
-      },
-      dueToday: {
-        count: Number(row?.dueToday ?? 0),
-        percent: percent(Number(row?.dueToday ?? 0)),
       },
       overdue: {
         count: Number(row?.overdue ?? 0),
